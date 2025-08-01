@@ -1,0 +1,59 @@
+{
+  "name": "chiral-static-client",
+  "version": "1.0.0",
+  "description": "Chiral Network Static Client for Hugo, Jekyll, Hexo and other static site generators",
+  "main": "assets/chiral-client.js",
+  "files": [
+    "assets/",
+    "core/",
+    "examples/",
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node build/build.js",
+    "build:dev": "node build/build.js --dev",
+    "build:prod": "node build/build.js --prod",
+    "serve": "node build/serve.js",
+    "test": "echo \"Error: no tests specified\" && exit 1",
+    "lint": "eslint core/ assets/ --fix",
+    "clean": "rimraf dist/",
+    "validate": "node build/validate.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/chiral-connector-js.git"
+  },
+  "keywords": [
+    "chiral",
+    "static-site",
+    "hugo",
+    "jekyll",
+    "hexo",
+    "vuepress",
+    "related-posts",
+    "wordpress"
+  ],
+  "author": "Chiral Network Team",
+  "license": "MIT",
+  "homepage": "https://github.com/your-org/chiral-connector-js#readme",
+  "bugs": {
+    "url": "https://github.com/your-org/chiral-connector-js/issues"
+  },
+  "devDependencies": {
+    "terser": "^5.19.0",
+    "clean-css": "^5.3.0",
+    "eslint": "^8.44.0",
+    "rimraf": "^5.0.0",
+    "http-server": "^14.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11"
+  ]
+} 

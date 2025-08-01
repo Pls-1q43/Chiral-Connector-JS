@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../Chiral-Hub-Core"
+		},
+		{
+			"path": "../../Chiral-Connector"
+		},
+		{
+			"path": ".."
+		}
+	]
+}

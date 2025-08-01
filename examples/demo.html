@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiral 静态客户端演示</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .demo-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #444;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 25px;
+        }
+        
+        .config-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 4px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+        
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #005a87;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+        }
+        
+        .platform-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .platform-tab {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .platform-tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .platform-content {
+            display: none;
+        }
+        
+        .platform-content.active {
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🌀 Chiral 静态客户端演示</h1>
+        
+        <div class="highlight">
+            <strong>💡 这是什么？</strong><br>
+            Chiral JS 客户端让您的静态博客（Hugo、Jekyll、Hexo等）能够显示来自 Chiral 网络的相关文章。
+            只需几行代码，就能让您的读者发现更多相关的优质内容！
+        </div>
+        
+        <div class="controls">
+            <h2>🎛️ 实时配置</h2>
+            <div class="control-group">
+                <label>Hub URL:</label>
+                <input type="text" id="hubUrl" value="https://hub.example.com" style="width: 300px;">
+            </div>
+            <div class="control-group">
+                <label>Node ID:</label>
+                <input type="text" id="nodeId" value="demo-blog" style="width: 200px;">
+            </div>
+            <div class="control-group">
+                <label>页面 URL:</label>
+                <input type="text" id="postUrl" value="https://blog.example.com/demo-post" style="width: 300px;">
+            </div>
+            <div class="control-group">
+                <label>文章数量:</label>
+                <input type="number" id="count" value="5" min="1" max="20" style="width: 80px;">
+            </div>
+            <div class="control-group">
+                <label>语言:</label>
+                <select id="locale">
+                    <option value="en">English</option>
+                    <option value="zh-CN" selected>简体中文</option>
+                    <option value="zh-TW">繁体中文</option>
+                    <option value="ja">日本語</option>
+                </select>
+            </div>
+            <button onclick="updateConfig()">更新配置</button>
+            <button onclick="testConnection()">测试连接</button>
+            <button onclick="clearCache()">清除缓存</button>
+            <button onclick="getStats()">缓存统计</button>
+        </div>
+
+        <div id="status"></div>
+
+        <h2>📄 当前配置</h2>
+        <div class="config-display" id="configDisplay">
+            <!-- 配置将在这里显示 -->
+        </div>
+
+        <h2>🎯 相关文章显示区域</h2>
+        <p>以下区域将显示来自 Chiral 网络的相关文章：</p>
+        <div id="chiral-connector-related-posts" 
+             class="chiral-connector-related-posts-container"
+             data-post-url="https://blog.example.com/demo-post"
+             data-node-id="demo-blog"
+             data-hub-url="https://hub.example.com"
+             data-count="5">
+            加载中的相关 Chiral 数据...
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>📋 集成代码示例</h2>
+        
+        <div class="platform-tabs">
+            <div class="platform-tab active" onclick="showPlatform('basic')">基础HTML</div>
+            <div class="platform-tab" onclick="showPlatform('hugo')">Hugo</div>
+            <div class="platform-tab" onclick="showPlatform('jekyll')">Jekyll</div>
+            <div class="platform-tab" onclick="showPlatform('hexo')">Hexo</div>
+        </div>
+
+        <div id="basic" class="platform-content active">
+            <h3>基础 HTML 集成</h3>
+            <div class="code-example">
+                <pre>&lt;!-- 1. 引入样式 --&gt;
+&lt;link rel="stylesheet" href="/assets/chiral-client.min.css"&gt;
+
+&lt;!-- 2. 配置客户端 --&gt;
+&lt;script&gt;
+window.ChiralConfig = {
+    hubUrl: 'https://your-hub.com',
+    nodeId: 'your-blog-id',
+    display: {
+        count: 5,
+        showThumbnails: true,
+        showExcerpts: true
+    },
+    i18n: {
+        locale: 'zh-CN'
+    }
+};
+&lt;/script&gt;
+
+&lt;!-- 3. 添加显示容器 --&gt;
+&lt;div id="chiral-connector-related-posts" 
+     data-post-url="https://blog.com/current-post"
+     data-node-id="your-blog-id"
+     data-hub-url="https://your-hub.com"&gt;
+    Loading...
+&lt;/div&gt;
+
+&lt;!-- 4. 引入客户端脚本 --&gt;
+&lt;script src="/assets/chiral-client.min.js"&gt;&lt;/script&gt;</pre>
+            </div>
+        </div>
+
+        <div id="hugo" class="platform-content">
+            <h3>Hugo 集成</h3>
+            <p><strong>步骤1：</strong> 在 <code>config.yaml</code> 中添加配置：</p>
+            <div class="code-example">
+                <pre>params:
+  chiral:
+    enable: true
+    hubUrl: "https://your-hub.com"
+    nodeId: "your-hugo-blog"
+    count: 5</pre>
+            </div>
+            
+            <p><strong>步骤2：</strong> 创建 <code>layouts/partials/chiral-related.html</code>：</p>
+            <div class="code-example">
+                <pre>{{ if .Site.Params.chiral.enable }}
+&lt;link rel="stylesheet" href="{{ "/assets/chiral-client.min.css" | relURL }}"&gt;
+
+&lt;script&gt;
+window.ChiralConfig = {
+    hubUrl: '{{ .Site.Params.chiral.hubUrl }}',
+    nodeId: '{{ .Site.Params.chiral.nodeId }}',
+    display: {
+        count: {{ .Site.Params.chiral.count | default 5 }}
+    }
+};
+&lt;/script&gt;
+
+&lt;div id="chiral-connector-related-posts" 
+     data-post-url="{{ .Permalink }}"
+     data-node-id="{{ .Site.Params.chiral.nodeId }}"
+     data-hub-url="{{ .Site.Params.chiral.hubUrl }}"&gt;
+    Loading related Chiral data...
+&lt;/div&gt;
+
+&lt;script src="{{ "/assets/chiral-client.min.js" | relURL }}"&gt;&lt;/script&gt;
+{{ end }}</pre>
+            </div>
+            
+            <p><strong>步骤3：</strong> 在文章模板中调用：</p>
+            <div class="code-example">
+                <pre>{{ .Content }}
+{{ partial "chiral-related.html" . }}</pre>
+            </div>
+        </div>
+
+        <div id="jekyll" class="platform-content">
+            <h3>Jekyll 集成</h3>
+            <p><strong>步骤1：</strong> 在 <code>_config.yml</code> 中添加配置：</p>
+            <div class="code-example">
+                <pre>chiral:
+  enable: true
+  hubUrl: "https://your-hub.com"
+  nodeId: "your-jekyll-blog"
+  count: 5</pre>
+            </div>
+            
+            <p><strong>步骤2：</strong> 创建 <code>_includes/chiral-related.html</code>：</p>
+            <div class="code-example">
+                <pre>{% if site.chiral.enable %}
+&lt;link rel="stylesheet" href="{{ '/assets/chiral-client.min.css' | relative_url }}"&gt;
+
+&lt;script&gt;
+window.ChiralConfig = {
+    hubUrl: '{{ site.chiral.hubUrl }}',
+    nodeId: '{{ site.chiral.nodeId }}',
+    display: {
+        count: {{ site.chiral.count | default: 5 }}
+    }
+};
+&lt;/script&gt;
+
+&lt;div id="chiral-connector-related-posts" 
+     data-post-url="{{ page.url | absolute_url }}"
+     data-node-id="{{ site.chiral.nodeId }}"
+     data-hub-url="{{ site.chiral.hubUrl }}"&gt;
+    Loading related Chiral data...
+&lt;/div&gt;
+
+&lt;script src="{{ '/assets/chiral-client.min.js' | relative_url }}"&gt;&lt;/script&gt;
+{% endif %}</pre>
+            </div>
+            
+            <p><strong>步骤3：</strong> 在 <code>_layouts/post.html</code> 中调用：</p>
+            <div class="code-example">
+                <pre>{{ content }}
+{% include chiral-related.html %}</pre>
+            </div>
+        </div>
+
+        <div id="hexo" class="platform-content">
+            <h3>Hexo 集成</h3>
+            <p><strong>步骤1：</strong> 在主题的 <code>_config.yml</code> 中添加配置：</p>
+            <div class="code-example">
+                <pre>chiral:
+  enable: true
+  hubUrl: "https://your-hub.com"
+  nodeId: "your-hexo-blog"
+  count: 5</pre>
+            </div>
+            
+            <p><strong>步骤2：</strong> 在 <code>layout/_partial/chiral-related.ejs</code> 中：</p>
+            <div class="code-example">
+                <pre>&lt;% if (theme.chiral && theme.chiral.enable) { %&gt;
+&lt;link rel="stylesheet" href="&lt;%- url_for('/assets/chiral-client.min.css') %&gt;"&gt;
+
+&lt;script&gt;
+window.ChiralConfig = {
+    hubUrl: '&lt;%= theme.chiral.hubUrl %&gt;',
+    nodeId: '&lt;%= theme.chiral.nodeId %&gt;',
+    display: {
+        count: &lt;%= theme.chiral.count || 5 %&gt;
+    }
+};
+&lt;/script&gt;
+
+&lt;div id="chiral-connector-related-posts" 
+     data-post-url="&lt;%= config.url %&gt;&lt;%= url_for(page.path) %&gt;"
+     data-node-id="&lt;%= theme.chiral.nodeId %&gt;"
+     data-hub-url="&lt;%= theme.chiral.hubUrl %&gt;"&gt;
+    Loading related Chiral data...
+&lt;/div&gt;
+
+&lt;script src="&lt;%- url_for('/assets/chiral-client.min.js') %&gt;"&gt;&lt;/script&gt;
+&lt;% } %&gt;</pre>
+            </div>
+            
+            <p><strong>步骤3：</strong> 在文章模板中调用：</p>
+            <div class="code-example">
+                <pre>&lt;%- partial('_partial/chiral-related') %&gt;</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🔧 调试工具</h2>
+        <p>打开浏览器开发者工具，在控制台中运行以下命令进行调试：</p>
+        
+        <div class="code-example">
+            <pre>// 查看客户端信息
+window.chiralClientInstance.getInfo()
+
+// 测试Hub连接
+window.chiralClientInstance.testConnection()
+
+// 查看缓存统计
+window.chiralClientInstance.getCacheStats()
+
+// 清除所有缓存
+window.chiralClientInstance.clearCache()
+
+// 启用调试日志
+localStorage.setItem('chiral_debug', 'true');</pre>
+        </div>
+        
+        <h3>常见问题排查</h3>
+        <ul>
+            <li><strong>显示"页面未找到"</strong>：您的文章可能尚未被Hub爬虫抓取</li>
+            <li><strong>配置错误</strong>：检查hubUrl和nodeId是否正确</li>
+            <li><strong>网络错误</strong>：确认Hub地址可以正常访问</li>
+            <li><strong>样式异常</strong>：确认CSS文件已正确加载</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>
+            📚 <strong>完整文档</strong>：查看 <code>USAGE_GUIDE.md</code> 获取详细使用说明<br>
+            🚀 <strong>快速上手</strong>：查看 <code>QUICK_START.md</code> 获取快速配置指南<br>
+            💡 <strong>获取帮助</strong>：提交 GitHub Issues 或联系技术支持团队
+        </p>
+    </div>
+
+    <!-- Chiral 静态客户端 CSS -->
+    <link rel="stylesheet" href="../assets/chiral-client.css">
+
+    <!-- Chiral 配置 -->
+    <script>
+        // 初始配置
+        window.ChiralConfig = {
+            hubUrl: 'https://hub.example.com',
+            nodeId: 'demo-blog',
+            i18n: {
+                locale: 'zh-CN'
+            },
+            display: {
+                count: 5,
+                enableCache: true,
+                cacheTTL: 3600,
+                showThumbnails: true,
+                showExcerpts: true
+            }
+        };
+
+        // 演示函数
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function updateConfigDisplay() {
+            const configDisplay = document.getElementById('configDisplay');
+            configDisplay.innerHTML = `<pre>${JSON.stringify(window.ChiralConfig, null, 2)}</pre>`;
+        }
+
+        function updateConfig() {
+            const hubUrl = document.getElementById('hubUrl').value;
+            const nodeId = document.getElementById('nodeId').value;
+            const postUrl = document.getElementById('postUrl').value;
+            const count = parseInt(document.getElementById('count').value);
+            const locale = document.getElementById('locale').value;
+
+            // 更新全局配置
+            window.ChiralConfig.hubUrl = hubUrl;
+            window.ChiralConfig.nodeId = nodeId;
+            window.ChiralConfig.display.count = count;
+            window.ChiralConfig.i18n.locale = locale;
+
+            // 更新容器属性
+            const container = document.getElementById('chiral-connector-related-posts');
+            container.setAttribute('data-post-url', postUrl);
+            container.setAttribute('data-node-id', nodeId);
+            container.setAttribute('data-hub-url', hubUrl);
+            container.setAttribute('data-count', count);
+
+            updateConfigDisplay();
+            showStatus('配置已更新！请等待客户端重新加载数据...', 'success');
+
+            // 重新初始化客户端
+            if (window.chiralClientInstance) {
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        async function testConnection() {
+            if (!window.chiralClientInstance) {
+                showStatus('客户端尚未初始化', 'warning');
+                return;
+            }
+
+            try {
+                showStatus('正在测试连接...', 'info');
+                const result = await window.chiralClientInstance.testConnection();
+                if (result) {
+                    showStatus('连接测试成功！', 'success');
+                } else {
+                    showStatus('连接测试失败，请检查Hub地址', 'error');
+                }
+            } catch (error) {
+                showStatus(`连接测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        function clearCache() {
+            if (!window.chiralClientInstance) {
+                showStatus('客户端尚未初始化', 'warning');
+                return;
+            }
+
+            const cleared = window.chiralClientInstance.clearCache();
+            showStatus(`已清除 ${cleared} 个缓存项`, 'success');
+        }
+
+        function getStats() {
+            if (!window.chiralClientInstance) {
+                showStatus('客户端尚未初始化', 'warning');
+                return;
+            }
+
+            const stats = window.chiralClientInstance.getCacheStats();
+            const message = `缓存统计: ${stats.totalItems} 项, ${stats.totalSize} 字节, 命中率: ${stats.hitRate}%`;
+            showStatus(message, 'info');
+        }
+
+        function showPlatform(platform) {
+            // 隐藏所有标签页
+            document.querySelectorAll('.platform-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.platform-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 显示选中的标签页
+            document.getElementById(platform).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateConfigDisplay();
+            
+            // 检查客户端是否成功加载
+            setTimeout(() => {
+                if (window.chiralClientInstance) {
+                    showStatus('Chiral 客户端已成功加载！', 'success');
+                } else {
+                    showStatus('Chiral 客户端加载失败，请检查配置', 'error');
+                }
+            }, 2000);
+        });
+    </script>
+
+    <!-- 引入 JS 客户端 -->
+    <script src="../assets/chiral-client.js"></script>
+</body>
+</html> 

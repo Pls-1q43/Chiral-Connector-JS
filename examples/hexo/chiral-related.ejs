@@ -1,0 +1,64 @@
+<%/*
+  Hexo Template for Chiral Related Posts
+  
+  This partial template can be included in your Hexo post layouts to display
+  related posts from the Chiral network.
+  
+  Usage:
+  1. Save this file as themes/your-theme/layout/_partial/chiral-related.ejs
+  2. Include in your post template: <%- partial('_partial/chiral-related') %>
+  3. Configure your site's Chiral settings in _config.yml
+*/%>
+
+<% if (config.chiral && config.chiral.enable) { %>
+<!-- Chiral Static Client CSS -->
+<link rel="stylesheet" href="https://cdn.chiral-network.com/static-client/v1/chiral-client.css">
+
+<!-- Chiral Configuration -->
+<script>
+window.ChiralConfig = {
+    hubUrl: '<%= config.chiral.hubUrl %>',
+    nodeId: '<%= config.chiral.nodeId %>',
+    <% if (config.chiral.locale) { %>
+    i18n: {
+        locale: '<%= config.chiral.locale %>'
+    },
+    <% } %>
+    display: {
+        count: <%= config.chiral.count || 5 %>,
+        enableCache: <%= config.chiral.enableCache !== false %>,
+        cacheTTL: <%= config.chiral.cacheTTL || 3600 %>,
+        showThumbnails: <%= config.chiral.showThumbnails !== false %>,
+        showExcerpts: <%= config.chiral.showExcerpts !== false %>
+    }
+};
+</script>
+
+<!-- Chiral Related Posts Container -->
+<div id="chiral-connector-related-posts" 
+     class="chiral-connector-related-posts-container"
+     data-post-url="<%= config.url %><%= url_for(page.path) %>"
+     data-node-id="<%= config.chiral.nodeId %>"
+     data-hub-url="<%= config.chiral.hubUrl %>"
+     data-count="<%= config.chiral.count || 5 %>">
+    Loading related Chiral data...
+</div>
+
+<!-- Chiral Static Client JavaScript -->
+<script src="https://cdn.chiral-network.com/static-client/v1/chiral-client.js"></script>
+<% } %>
+
+<%/*
+  Configuration Example for _config.yml:
+  
+  chiral:
+    enable: true
+    hubUrl: "https://your-hub.com"
+    nodeId: "your-hexo-blog"
+    locale: "en"  # Optional: en, zh-CN, zh-TW, ja
+    count: 5      # Optional: number of related posts
+    enableCache: true     # Optional: enable browser caching
+    cacheTTL: 3600       # Optional: cache TTL in seconds
+    showThumbnails: true # Optional: show post thumbnails
+    showExcerpts: true   # Optional: show post excerpts
+*/%> 

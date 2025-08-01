@@ -1,0 +1,65 @@
+{{/*
+  Hugo Template for Chiral Related Posts
+  
+  This partial template can be included in your Hugo post layouts to display
+  related posts from the Chiral network.
+  
+  Usage:
+  1. Save this file as layouts/partials/chiral-related.html
+  2. Include in your post template: {{ partial "chiral-related.html" . }}
+  3. Configure your site's Chiral settings in config files or params
+*/}}
+
+{{ if .Site.Params.chiral.enable }}
+<!-- Chiral Static Client CSS -->
+<link rel="stylesheet" href="https://cdn.chiral-network.com/static-client/v1/chiral-client.css">
+
+<!-- Chiral Configuration -->
+<script>
+window.ChiralConfig = {
+    hubUrl: '{{ .Site.Params.chiral.hubUrl }}',
+    nodeId: '{{ .Site.Params.chiral.nodeId }}',
+    {{- if .Site.Params.chiral.locale }}
+    i18n: {
+        locale: '{{ .Site.Params.chiral.locale }}'
+    },
+    {{- end }}
+    display: {
+        count: {{ .Site.Params.chiral.count | default 5 }},
+        enableCache: {{ .Site.Params.chiral.enableCache | default true }},
+        cacheTTL: {{ .Site.Params.chiral.cacheTTL | default 3600 }},
+        showThumbnails: {{ .Site.Params.chiral.showThumbnails | default true }},
+        showExcerpts: {{ .Site.Params.chiral.showExcerpts | default true }}
+    }
+};
+</script>
+
+<!-- Chiral Related Posts Container -->
+<div id="chiral-connector-related-posts" 
+     class="chiral-connector-related-posts-container"
+     data-post-url="{{ .Permalink }}"
+     data-node-id="{{ .Site.Params.chiral.nodeId }}"
+     data-hub-url="{{ .Site.Params.chiral.hubUrl }}"
+     data-count="{{ .Site.Params.chiral.count | default 5 }}">
+    Loading related Chiral data...
+</div>
+
+<!-- Chiral Static Client JavaScript -->
+<script src="https://cdn.chiral-network.com/static-client/v1/chiral-client.js"></script>
+{{ end }}
+
+{{/*
+  Configuration Example for config.yaml:
+  
+  params:
+    chiral:
+      enable: true
+      hubUrl: "https://your-hub.com"
+      nodeId: "your-hugo-blog"
+      locale: "en"  # Optional: en, zh-CN, zh-TW, ja
+      count: 5      # Optional: number of related posts
+      enableCache: true     # Optional: enable browser caching
+      cacheTTL: 3600       # Optional: cache TTL in seconds
+      showThumbnails: true # Optional: show post thumbnails
+      showExcerpts: true   # Optional: show post excerpts
+*/}} 

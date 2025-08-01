@@ -1,0 +1,64 @@
+<!--
+  Jekyll Include for Chiral Related Posts
+  
+  This include can be used in your Jekyll post layouts to display
+  related posts from the Chiral network.
+  
+  Usage:
+  1. Save this file as _includes/chiral-related.html
+  2. Include in your post layout: {% include chiral-related.html %}
+  3. Configure your site's Chiral settings in _config.yml
+-->
+
+{% if site.chiral.enable %}
+<!-- Chiral Static Client CSS -->
+<link rel="stylesheet" href="https://cdn.chiral-network.com/static-client/v1/chiral-client.css">
+
+<!-- Chiral Configuration -->
+<script>
+window.ChiralConfig = {
+    hubUrl: '{{ site.chiral.hubUrl }}',
+    nodeId: '{{ site.chiral.nodeId }}',
+    {% if site.chiral.locale %}
+    i18n: {
+        locale: '{{ site.chiral.locale }}'
+    },
+    {% endif %}
+    display: {
+        count: {{ site.chiral.count | default: 5 }},
+        enableCache: {{ site.chiral.enableCache | default: true }},
+        cacheTTL: {{ site.chiral.cacheTTL | default: 3600 }},
+        showThumbnails: {{ site.chiral.showThumbnails | default: true }},
+        showExcerpts: {{ site.chiral.showExcerpts | default: true }}
+    }
+};
+</script>
+
+<!-- Chiral Related Posts Container -->
+<div id="chiral-connector-related-posts" 
+     class="chiral-connector-related-posts-container"
+     data-post-url="{{ page.url | absolute_url }}"
+     data-node-id="{{ site.chiral.nodeId }}"
+     data-hub-url="{{ site.chiral.hubUrl }}"
+     data-count="{{ site.chiral.count | default: 5 }}">
+    Loading related Chiral data...
+</div>
+
+<!-- Chiral Static Client JavaScript -->
+<script src="https://cdn.chiral-network.com/static-client/v1/chiral-client.js"></script>
+{% endif %}
+
+<!--
+  Configuration Example for _config.yml:
+  
+  chiral:
+    enable: true
+    hubUrl: "https://your-hub.com"
+    nodeId: "your-jekyll-blog"
+    locale: "en"  # Optional: en, zh-CN, zh-TW, ja
+    count: 5      # Optional: number of related posts
+    enableCache: true     # Optional: enable browser caching
+    cacheTTL: 3600       # Optional: cache TTL in seconds
+    showThumbnails: true # Optional: show post thumbnails
+    showExcerpts: true   # Optional: show post excerpts
+--> 
