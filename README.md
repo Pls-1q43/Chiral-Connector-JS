@@ -1,5 +1,7 @@
 # Chiral Network JS Client Usage Guide
 
+[Chinese｜中文版](https://github.com/Pls-1q43/Chiral-Connector-JS/blob/main/READEME_CN.md)
+
 > 📖 **For Static Blog Owners**: How to use Chiral JS client to join the Chiral network
 
 ## 🎯 What is Chiral Network JS Client?
