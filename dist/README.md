@@ -6,10 +6,12 @@
 
 Chiral JavaScript 静态客户端是一个轻量级的前端库，专为静态博客平台（Hugo、Jekyll、Hexo、VuePress 等）设计，让静态站点能够展示来自 Chiral 网络的相关文章。
 
-### 特性
+### ⭐ 核心特性
 
 - ✅ **纯前端实现** - 无需服务端配置，直接调用 WordPress.com Public API
-- ✅ **极简配置** - 只需 Hub URL 和 Node ID 两个必需参数
+- ✅ **极简配置** - 只需 Hub URL 一个必需参数，无需 Node ID
+- ✅ **智能识别** - 基于域名自动识别站点身份
+- ✅ **混合架构** - 优化性能，减少 Hub 负载
 - ✅ **样式一致** - 完全复用 Chiral-Connector 的前端样式
 - ✅ **多语言支持** - 内置中文（简体/繁体）、英文、日文支持
 - ✅ **智能缓存** - 基于 localStorage 的自动缓存机制
@@ -130,7 +132,7 @@ chiral:
 |------|------|------|
 | `hubUrl` | string | Chiral Hub 的完整 URL |
 
-> **重要**：无需配置 `nodeId`，客户端通过域名验证自动确定身份。
+> **重要**：无需配置 `nodeId`，客户端通过域名自动识别站点身份，大大简化了配置过程。
 
 ### 显示配置（可选）
 
@@ -236,74 +238,97 @@ npm run build:prod
 npm run serve
 ```
 
-### 项目结构
+### 🏗️ 项目结构
 
 ```
 chiral-connector-js/
 ├── core/                  # 核心模块
-│   ├── config.js         # 配置管理
-│   ├── i18n.js           # 国际化
-│   ├── cache.js          # 缓存管理
-│   ├── api.js            # API 调用
-│   ├── display.js        # 显示逻辑
-│   └── utils.js          # 工具函数
-├── assets/               # 资源文件
-│   ├── chiral-client.css # 样式文件
-│   └── chiral-client.js  # 主入口
+│   ├── config.js         # 配置管理 (验证、规范化、默认值)
+│   ├── api.js            # API 调用 (WordPress.com API + Hub 代理)
+│   ├── display.js        # 显示逻辑 (渲染、状态管理)
+│   ├── cache.js          # 缓存管理 (localStorage + TTL)
+│   ├── i18n.js           # 国际化 (多语言支持)
+│   └── utils.js          # 工具函数 (日志、验证等)
+├── assets/               # 前端资源
+│   ├── chiral-client.js  # 主入口文件 (统一接口)
+│   └── chiral-client.css # 样式文件 (响应式 + 暗色模式)
 ├── examples/             # 平台集成示例
-│   ├── hugo/
-│   ├── jekyll/
-│   ├── hexo/
-│   └── vuepress/
-├── dist/                 # 构建输出
-└── build/                # 构建脚本
+│   ├── hugo/             # Hugo 集成模板
+│   ├── jekyll/           # Jekyll 集成模板
+│   ├── hexo/             # Hexo 集成模板
+│   └── vuepress/         # VuePress 组件
+├── dist/                 # 构建输出 (生产版本)
+│   ├── chiral-client.min.js    # 压缩版 JS
+│   └── chiral-client.min.css   # 压缩版 CSS
+└── build/                # 构建工具
+    ├── build.js          # 主构建脚本
+    └── serve.js          # 开发服务器
 ```
 
-## 工作原理
+## 🔧 工作原理
 
-采用混合架构，最小化 Hub 负载的同时解决跨域限制：
+采用创新的混合架构，在保证功能完整性的同时最大化性能：
 
-1. **数据同步**：静态博客的 RSS/Sitemap 由 Hub 端的 RSS Crawler 自动抓取
-2. **CPT 查找**：客户端直接调用 WordPress.com API 查找当前页面的 chiral_data CPT（GET 请求）
-3. **相关文章 ID**：通过 Hub 代理获取相关文章 ID 列表（解决 POST 跨域问题）
-4. **文章详情**：客户端直接调用 WordPress.com API 获取每篇相关文章的详情（GET 请求）
-5. **前端渲染**：生成 HTML 并插入页面指定容器
+### 数据流程
+1. **RSS 自动抓取**：Hub 端的 RSS Crawler 自动抓取静态博客的 RSS/Sitemap
+2. **智能匹配**：客户端基于当前页面 URL 查找对应的 `chiral_data` CPT
+3. **相关文章查询**：通过 Hub 代理端点获取相关文章 ID 列表（解决 CORS 限制）
+4. **并行获取详情**：直接调用 WordPress.com API 并行获取各文章详细信息
+5. **智能渲染**：生成 HTML 并插入指定容器，复用 Chiral-Connector 样式
 
-### 架构优势
+### 🎯 架构优势
 
-- 🚀 **性能优化**：减少 Hub 端负载，大部分请求直接访问 WordPress.com
-- 🔧 **独立运行**：不再依赖 Jetpack Related Posts 功能，避免与 Node 站点冲突
-- ⚡ **响应快速**：并行处理多个 GET 请求，提升响应速度
-- 💾 **缓存高效**：利用浏览器和 CDN 缓存 WordPress.com API 响应
-- 🛡️ **简化部署**：Hub 端无需启用 Jetpack Related Posts 模块
+- 🚀 **性能优化**：80% 请求直接访问 WordPress.com，减少 Hub 负载
+- 🔧 **配置简化**：无需 Node ID，基于域名自动识别
+- ⚡ **响应快速**：并行处理多个 API 请求，提升响应速度
+- 💾 **缓存高效**：智能缓存策略，支持 TTL 和自动清理
+- 🛡️ **部署简单**：Hub 端无需复杂配置，专注数据同步
+- 🔒 **安全可靠**：使用公开 API，无需认证信息
 
-## 安全机制
+## 🔒 安全机制
 
 - **公开 API**：使用 WordPress.com 公开 API，无需身份验证
 - **无敏感配置**：客户端无需任何认证信息或密钥
-- **简化架构**：移除复杂的域名验证，专注核心功能
+- **域名验证**：Hub 端基于 Referer 头进行域名验证
+- **XSS 防护**：所有用户输入经过严格的 HTML 转义
+- **CORS 友好**：通过 Hub 代理解决跨域限制
 
-## 浏览器支持
+## 🌐 浏览器支持
 
-- Chrome/Edge 80+
-- Firefox 75+
-- Safari 13+
-- 移动端浏览器
+| 浏览器 | 版本要求 | 说明 |
+|--------|----------|------|
+| Chrome | 80+ | 完全支持 |
+| Edge | 80+ | 完全支持 |
+| Firefox | 75+ | 完全支持 |
+| Safari | 13+ | 完全支持 |
+| 移动浏览器 | 现代版本 | 响应式适配 |
 
-## 许可证
+## 📋 路线图
 
-MIT License
+- [ ] TypeScript 类型定义
+- [ ] React/Vue 组件封装
+- [ ] 更多静态站点生成器支持
+- [ ] 性能监控和分析
+- [ ] 主题系统和自定义样式
 
-## 支持和贡献
+## 📄 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+## 🤝 支持和贡献
 
 - 问题反馈：[GitHub Issues](https://github.com/your-org/chiral-connector-js/issues)
 - 功能请求：[GitHub Discussions](https://github.com/your-org/chiral-connector-js/discussions)
 - 贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)
+- 技术文档：[Wiki](https://github.com/your-org/chiral-connector-js/wiki)
 
-## 版本历史
+## 📚 版本历史
 
-### v1.0.0
-- 初始版本发布
-- 支持基础的相关文章显示功能
-- 多语言支持（中英日）
-- 主流静态博客平台集成示例 
+### v1.0.0 (当前版本)
+- ✨ 初始版本发布
+- ✨ 混合架构设计，优化性能
+- ✨ 智能域名识别，无需 Node ID
+- ✨ 完整的多语言支持（中英日）
+- ✨ 智能缓存机制，支持 TTL
+- ✨ 主流静态博客平台集成示例
+- ✨ 响应式设计和暗色模式支持 

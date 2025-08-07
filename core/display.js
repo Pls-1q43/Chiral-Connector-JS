@@ -12,7 +12,7 @@ class ChiralDisplay {
         }
 
         this.config = new ChiralConfig(config);
-        this.api = new ChiralAPI(this.config.get('hubUrl'), this.config.get('nodeId'));
+        this.api = new ChiralAPI(this.config.get('hubUrl'));
         this.cache = new ChiralCache('chiral_static');
         
         // Initialize i18n

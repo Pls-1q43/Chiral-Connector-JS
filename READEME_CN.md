@@ -4,63 +4,49 @@
 
 ## 🎯 什么是 Chiral Network JS 客户端？
 
-Chiral JS 客户端是一个轻量级的 JavaScript 库，让您的静态博客（Hugo、Jekyll、Hexo 等）能够显示来自 Chiral 网络的相关文章。无需复杂配置，只需几行代码即可接入整个 Chiral 内容生态。
+Chiral JS 客户端是一个专为静态博客设计的轻量级 JavaScript 库，让您的静态站点（Hugo、Jekyll、Hexo、VuePress 等）能够显示来自 Chiral 网络的相关文章，实现跨站的相关文章推荐，打破信息孤岛。
+采用创新的混合架构，无需复杂配置，只需一个 Hub 地址即可接入整个 Chiral 内容生态。
 
 ## 📋 前提条件
 
 在开始之前，您需要：
 
 1. **一个静态博客站点**（Hugo、Jekyll、Hexo、VuePress 等）
-2. **加入 Chiral 网络**：您的博客需要先被 Chiral Hub 收录
-3. **获得配置信息**：
+2. **加入 Chiral 网络**：您需要先在一个已经建立的 Chiral Network Hub 上注册。
+3. **获得 Hub 地址**：
    - `Hub URL`：您所加入的 Chiral Hub 地址
-   - `Node ID`：您的博客在该 Hub 中的标识
 
 > 💡 **如何加入 Chiral 网络？**  
-> 联系 Chiral Hub 的管理员，提供您的博客 RSS 地址，管理员会为您分配 Node ID。
+> 在 Chiral Hub 上注册，填写您的博客 RSS 地址，Sitemap，完成首次同步后，RSS 会自动抓取。
 
-## 🚀 快速开始（3分钟接入）
+## 🚀 快速开始（1分钟接入）
 
-### 步骤 1：下载客户端文件
+### 只需添加3行代码！
 
-从项目的 `dist/` 目录下载这两个文件：
-- `chiral-client.min.js` （22KB，生产版本）
-- `chiral-client.min.css` （2KB，样式文件）
-
-### 步骤 2：在网站中引入文件
-
-在您网站的**单篇文章模板**中添加以下代码：
+1. **下载文件**：从项目的 `dist/` 目录下载 `chiral-client.min.js` 和 `chiral-client.min.css`
+2. **复制粘贴**：在您的**单篇文章模板**中添加以下代码：
 
 ```html
-<!-- 引入 CSS 样式 -->
+<!-- 引入样式 -->
 <link rel="stylesheet" href="/assets/chiral-client.min.css">
 
-<!-- 配置 Chiral 客户端 -->
-<script>
-window.ChiralConfig = {
-    hubUrl: 'https://your-hub.com',      // 替换为您的 Hub 地址
-    nodeId: 'your-blog-id'               // 替换为您的 Node ID
-};
-</script>
+<!-- 相关文章容器 -->
+<div id="chiral-related-posts">Loading related Chiral data...</div>
 
-<!-- 引入 JS 客户端 -->
-<script src="/assets/chiral-client.min.js"></script>
+<!-- 引入客户端（配置参数） -->
+<script src="/assets/chiral-client.min.js" 
+        data-container="chiral-related-posts" 
+        data-hub-url="https://your-hub.com" 
+        data-count="5" 
+        data-auto-init="true"></script>
 ```
 
-### 步骤 3：在文章页面添加显示容器
+**参数说明**：
+- `data-hub-url`：替换为您的 Chiral Hub 地址
+- `data-count`：显示文章数量（可选，默认5篇）
+- `data-container`：容器ID（必须与div的id匹配）
 
-在您网站**单篇文章模板**希望显示相关文章的位置添加：
-
-```html
-<div id="chiral-connector-related-posts" 
-     data-post-url="当前文章的完整URL"
-     data-node-id="your-blog-id"
-     data-hub-url="https://your-hub.com">
-    加载中的相关 Chiral 数据...
-</div>
-```
-
-🎉 **完成！** 现在访问您的文章页面，就能看到来自 Chiral 网络的相关文章了。
+🎉 **完成！** 访问文章页面即可看到相关文章。无需配置文件，无需复杂设置！
 
 ## ⚙️ 详细配置选项
 
@@ -68,11 +54,8 @@ window.ChiralConfig = {
 
 ```javascript
 window.ChiralConfig = {
-    // 【必需】Hub 地址
+    // 【必需】Hub 地址 (唯一必需配置)
     hubUrl: 'https://hub.example.com',
-    
-    // 【必需】您的博客 Node ID  
-    nodeId: 'my-blog',
     
     // 【可选】显示设置
     display: {
@@ -96,61 +79,54 @@ window.ChiralConfig = {
 ```html
 <div id="chiral-connector-related-posts" 
      data-post-url="https://blog.com/post-title"    <!-- 当前文章URL -->
-     data-node-id="my-blog"                         <!-- 博客Node ID -->
      data-hub-url="https://hub.example.com"         <!-- Hub地址 -->
      data-count="5">                                <!-- 显示数量 -->
-    Loading...
+    Loading related Chiral data...
 </div>
 ```
 
 ## 🔧 各平台集成方法
 
-### Hugo 集成
+### Hugo 集成（已验证✔）
 
 #### 方法一：全局配置
 
-在 `config.yaml` 中添加：
+在 `hugo.toml` 中添加：
 
-```yaml
-params:
-  chiral:
-    enable: true
-    hubUrl: "https://your-hub.com"
-    nodeId: "your-hugo-blog"
-    count: 5
+```toml
+[params]
+  [params.chiral]
+    enable = true
+    hubUrl = "https://yourhub.com"
+    count = 5
 ```
 
 创建 `layouts/partials/chiral-related.html`：
 
 ```html
 {{ if .Site.Params.chiral.enable }}
-<link rel="stylesheet" href="{{ "/assets/chiral-client.min.css" | relURL }}">
+{{- $chiralCSS := resources.Get "chiral-client.min.css" -}}
+{{- $chiralJS := resources.Get "chiral-client.min.js" -}}
 
-<script>
-window.ChiralConfig = {
-    hubUrl: '{{ .Site.Params.chiral.hubUrl }}',
-    nodeId: '{{ .Site.Params.chiral.nodeId }}',
-    display: {
-        count: {{ .Site.Params.chiral.count | default 5 }}
-    },
-    i18n: {
-        locale: '{{ .Site.Language.Lang | default "en" }}'
-    }
-};
-</script>
+<link rel="stylesheet" href="{{ $chiralCSS.RelPermalink }}">
 
 <div id="chiral-connector-related-posts" 
      data-post-url="{{ .Permalink }}"
-     data-node-id="{{ .Site.Params.chiral.nodeId }}"
-     data-hub-url="{{ .Site.Params.chiral.hubUrl }}">
+     data-hub-url="{{ .Site.Params.chiral.hubUrl }}"
+     data-count="{{ .Site.Params.chiral.count | default 5 }}">
     Loading related Chiral data...
 </div>
 
-<script src="{{ "/assets/chiral-client.min.js" | relURL }}"></script>
+<!-- 使用 data 属性方式初始化 -->
+<script src="{{ $chiralJS.RelPermalink }}" 
+        data-container="chiral-connector-related-posts" 
+        data-hub-url="{{ .Site.Params.chiral.hubUrl }}" 
+        data-count="{{ .Site.Params.chiral.count | default 5 }}" 
+        data-auto-init="true"></script>
 {{ end }}
 ```
 
-在单篇文章模板中调用：
+在单篇文章模板(single.html)中调用：
 
 ```html
 {{ partial "chiral-related.html" . }}
@@ -166,24 +142,21 @@ window.ChiralConfig = {
 
 <!-- Chiral 相关文章 -->
 <link rel="stylesheet" href="{{ "/assets/chiral-client.min.css" | relURL }}">
-<script>
-window.ChiralConfig = {
-    hubUrl: 'https://your-hub.com',
-    nodeId: 'your-hugo-blog'
-};
-</script>
 
 <div id="chiral-connector-related-posts" 
-     data-post-url="{{ .Permalink }}"
-     data-node-id="your-hugo-blog"
-     data-hub-url="https://your-hub.com">
+     data-post-url="{{ .Permalink }}">
     Loading related Chiral data...
 </div>
 
-<script src="{{ "/assets/chiral-client.min.js" | relURL }}"></script>
+<!-- 使用 data 属性方式初始化 -->
+<script src="{{ "/assets/chiral-client.min.js" | relURL }}" 
+        data-container="chiral-connector-related-posts" 
+        data-hub-url="https://your-hub.com" 
+        data-count="5" 
+        data-auto-init="true"></script>
 ```
 
-### Jekyll 集成
+### Jekyll 集成(未验证)
 
 在 `_config.yml` 中添加：
 
@@ -191,7 +164,6 @@ window.ChiralConfig = {
 chiral:
   enable: true
   hubUrl: "https://your-hub.com"
-  nodeId: "your-jekyll-blog"
   count: 5
 ```
 
@@ -204,7 +176,6 @@ chiral:
 <script>
 window.ChiralConfig = {
     hubUrl: '{{ site.chiral.hubUrl }}',
-    nodeId: '{{ site.chiral.nodeId }}',
     display: {
         count: {{ site.chiral.count | default: 5 }}
     }
@@ -213,7 +184,6 @@ window.ChiralConfig = {
 
 <div id="chiral-connector-related-posts" 
      data-post-url="{{ page.url | absolute_url }}"
-     data-node-id="{{ site.chiral.nodeId }}"
      data-hub-url="{{ site.chiral.hubUrl }}">
     Loading related Chiral data...
 </div>
@@ -231,7 +201,7 @@ window.ChiralConfig = {
 {% include chiral-related.html %}
 ```
 
-### Hexo 集成
+### Hexo 集成（已验证✔）
 
 在主题的 `layout/_partial/` 目录创建 `chiral-related.ejs`：
 
@@ -242,7 +212,6 @@ window.ChiralConfig = {
 <script>
 window.ChiralConfig = {
     hubUrl: '<%= theme.chiral.hubUrl %>',
-    nodeId: '<%= theme.chiral.nodeId %>',
     display: {
         count: <%= theme.chiral.count || 5 %>
     }
@@ -251,7 +220,6 @@ window.ChiralConfig = {
 
 <div id="chiral-connector-related-posts" 
      data-post-url="<%= config.url %><%= url_for(page.path) %>"
-     data-node-id="<%= theme.chiral.nodeId %>"
      data-hub-url="<%= theme.chiral.hubUrl %>">
     Loading related Chiral data...
 </div>
@@ -266,7 +234,6 @@ window.ChiralConfig = {
 chiral:
   enable: true
   hubUrl: "https://your-hub.com"
-  nodeId: "your-hexo-blog"
   count: 5
 ```
 
@@ -277,7 +244,7 @@ chiral:
 <%- partial('_partial/chiral-related') %>
 ```
 
-### VuePress 集成
+### VuePress 集成（未验证）
 
 创建 `.vuepress/components/ChiralRelated.vue`：
 
@@ -285,8 +252,7 @@ chiral:
 <template>
   <div>
     <div id="chiral-connector-related-posts" 
-         :data-post-url="$page.path"
-         :data-node-id="nodeId"
+         :data-post-url="fullUrl"
          :data-hub-url="hubUrl">
       Loading related Chiral data...
     </div>
@@ -299,8 +265,7 @@ export default {
   
   data() {
     return {
-      hubUrl: 'https://your-hub.com',
-      nodeId: 'your-vuepress-blog'
+      hubUrl: 'https://your-hub.com'
     };
   },
   
@@ -313,8 +278,7 @@ export default {
     
     // 配置客户端
     window.ChiralConfig = {
-      hubUrl: this.hubUrl,
-      nodeId: this.nodeId
+      hubUrl: this.hubUrl
     };
     
     // 动态加载 JS
@@ -391,7 +355,7 @@ export default {
 
 **Q: 显示"Chiral Client configuration error"**
 - **原因**：配置参数错误
-- **解决**：检查 `hubUrl` 和 `nodeId` 是否正确
+- **解决**：检查 `hubUrl` 是否正确且可访问
 
 **Q: 控制台出现网络错误**
 - **原因**：Hub 地址不可访问或网络问题
@@ -458,20 +422,54 @@ if (document.getElementById('chiral-connector-related-posts')) {
 }
 ```
 
-### CDN 加速
+---
 
-使用 CDN 托管客户端文件：
+## 🚀 高级特性
 
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/your-repo/dist/chiral-client.min.css">
-<script src="https://cdn.jsdelivr.net/gh/your-repo/dist/chiral-client.min.js"></script>
+### 编程式 API
+
+除了自动初始化，您还可以通过编程方式使用客户端：
+
+```javascript
+// 手动初始化客户端
+const client = ChiralClient.init({
+    hubUrl: 'https://your-hub.com'
+});
+
+// 获取特定 URL 的相关文章
+client.getRelatedPosts('https://blog.com/post', 5)
+    .then(posts => console.log('Related posts:', posts));
+
+// 测试连接
+client.testConnection()
+    .then(connected => console.log('Connected:', connected));
 ```
 
-## 📞 获取帮助
+### 事件监听
 
-- **GitHub Issues**：报告问题和建议
-- **文档站点**：详细技术文档
-- **社区讨论**：与其他博主交流经验
+```javascript
+// 监听客户端就绪事件
+window.addEventListener('chiralClientReady', function(event) {
+    console.log('Chiral Client ready:', event.detail);
+});
+
+// 监听数据加载完成事件
+window.addEventListener('chiralDataLoaded', function(event) {
+    console.log('Posts loaded:', event.detail.posts.length);
+});
+```
+
+### 缓存管理
+
+```javascript
+// 获取缓存统计
+const stats = window.chiralClientInstance.getCacheStats();
+console.log('Cache stats:', stats);
+
+// 清理过期缓存
+const cleaned = window.chiralClientInstance.cleanExpiredCache();
+console.log('Cleaned items:', cleaned);
+```
 
 ---
 

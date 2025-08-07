@@ -258,26 +258,23 @@
             
             if (scriptToCheck) {
                 const hubUrl = scriptToCheck.getAttribute('data-hub-url');
-                const nodeId = scriptToCheck.getAttribute('data-node-id');
                 const container = scriptToCheck.getAttribute('data-container') || 'chiral-related-posts';
                 const count = parseInt(scriptToCheck.getAttribute('data-count')) || 5;
                 
                 ChiralUtils.log('Script element found', 'info', scriptToCheck);
                 ChiralUtils.log('Raw attributes', 'info', {
                     'data-hub-url': scriptToCheck.getAttribute('data-hub-url'),
-                    'data-node-id': scriptToCheck.getAttribute('data-node-id'),
                     'data-container': scriptToCheck.getAttribute('data-container'),
                     'data-count': scriptToCheck.getAttribute('data-count')
                 });
-                ChiralUtils.log('Processed values', 'info', { hubUrl, nodeId, container, count });
+                ChiralUtils.log('Processed values', 'info', { hubUrl, container, count });
                 
-                if (hubUrl && nodeId) {
+                if (hubUrl) {
                     try {
-                        ChiralUtils.log('Auto-initializing from data attributes', 'info', { hubUrl, nodeId, container, count });
+                        ChiralUtils.log('Auto-initializing from data attributes', 'info', { hubUrl, container, count });
                         
                         const config = {
                             hubUrl: hubUrl,
-                            nodeId: nodeId,
                             containerId: container,
                             display: {
                                 count: count,
@@ -301,11 +298,11 @@
                         }
                     }
                 } else {
-                    ChiralUtils.log('Missing required data attributes (data-hub-url, data-node-id)', 'warn');
+                    ChiralUtils.log('Missing required data attribute: data-hub-url', 'warn');
                     // Only show error if container exists and user intended to use auto-init
                     const containerEl = document.getElementById(container);
                     if (containerEl && scriptToCheck.getAttribute('data-auto-init') === 'true') {
-                        containerEl.innerHTML = '<p class="chiral-no-related-posts">Missing required configuration: data-hub-url and data-node-id are required.</p>';
+                        containerEl.innerHTML = '<p class="chiral-no-related-posts">Missing required configuration: data-hub-url is required.</p>';
                     }
                 }
             } else {
